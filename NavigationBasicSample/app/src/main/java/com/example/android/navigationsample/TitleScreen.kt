@@ -16,13 +16,19 @@
 
 package com.example.android.navigationsample
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Context
+import android.os.Build
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import androidx.core.app.NotificationCompat
+import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
+import androidx.navigation.fragment.findNavController
 
 /**
  * Shows the main title screen.
@@ -40,6 +46,39 @@ class TitleScreen : Fragment() {
             Navigation.findNavController(view).navigate(R.id.action_title_screen_to_leaderboard)
         }
 
+        view.findViewById<Button>(R.id.show_notification).setOnClickListener {
+            showNotification()
+        }
+
         return view
+    }
+
+    private fun showNotification() {
+        val args = Bundle()
+        val channelId = "Channel_Id"
+        args.putString("userName", "Tuan")
+        val deeplink = findNavController().createDeepLink()
+            .setGraph(R.navigation.navigation)
+            .setDestination(R.id.user_profile)
+            .setArguments(args)
+            .createPendingIntent()
+        val notificationManager =
+            requireContext().getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            notificationManager.createNotificationChannel(
+                NotificationChannel(
+                    channelId, "Deep Links", NotificationManager.IMPORTANCE_HIGH
+                )
+            )
+        }
+        val builder = NotificationCompat.Builder(
+            requireContext(), channelId
+        )
+            .setContentTitle("Navigation")
+            .setContentText("Deep link to Android")
+            .setSmallIcon(R.mipmap.ic_launcher)
+            .setContentIntent(deeplink)
+            .setAutoCancel(true)
+        notificationManager.notify(0, builder.build())
     }
 }

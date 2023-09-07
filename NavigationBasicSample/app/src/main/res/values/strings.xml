@@ -48,4 +48,5 @@
     <string name="losses">Losses</string>
     <string name="losses_amount">03</string>
     <string name="congratulations">Congratulations!</string>
+    <string name="show_notification">Show notification</string>
 </resources>
